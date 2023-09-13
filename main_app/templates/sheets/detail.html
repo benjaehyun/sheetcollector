@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Sheet Details</h1>
+
+<div class="card">
+  <div class="card-content">
+    <span class="card-title">{{ sheet.title }}</span>
+    <p>Composer: {{ sheet.composer }}</p>
+    <p>Description: {{ sheet.description|linebreaks }}</p>
+    <!-- {% if cat.age > 0 %} -->
+      <p>Key: {{ sheet.key }} {{ sheet.diatonic }}</p>
+    <!-- {% else %}
+      <p>Age: Kitten</p>
+    {% endif %} -->
+  </div>
+  <div class="card-action">
+    <a href="{% url 'sheets_update' sheet.id %}">Edit</a>
+    <a href="{% url 'sheets_delete' sheet.id %}">Delete</a>
+  </div>
+</div>
+
+{% endblock %}

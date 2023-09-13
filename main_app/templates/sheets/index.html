@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Sheets List</h1>
+
+{% for sheet in sheets %}
+    <a href="{% url 'detail' sheet.id %}">
+        <div class="card">
+            <div class="card-content">
+            <span class="card-title">{{ sheet.title }}</span>
+            <p>Composer: {{ sheet.composer }}</p>
+            <p>Description: {{ sheet.description }}</p>
+            {% if sheet.key %}
+                <p>Key: {{ sheet.key }}</p>
+            {% else %}
+                <p>Key: Unknown</p>
+            {% endif %}
+            </div>
+        </div>
+    </a>
+{% endfor %}
+
+{% endblock %}
