@@ -3,21 +3,114 @@
 
 <h1>Sheet Details</h1>
 
-<div class="card">
-  <div class="card-content">
-    <span class="card-title">{{ sheet.title }}</span>
-    <p>Composer: {{ sheet.composer }}</p>
-    <p>Description: {{ sheet.description|linebreaks }}</p>
-    <!-- {% if cat.age > 0 %} -->
-      <p>Key: {{ sheet.key }} {{ sheet.diatonic }}</p>
-    <!-- {% else %}
-      <p>Age: Kitten</p>
-    {% endif %} -->
+<div class="row">
+    <div class="col s6">
+        <div class="card">
+        <div class="card-content">
+            <span class="card-title">{{ sheet.title }}</span>
+            <p>Composer: {{ sheet.composer }}</p>
+            <p>Description: {{ sheet.description|linebreaks }}</p>
+            <p>Key: {{ sheet.key }} {{ sheet.diatonic }}</p>
+        </div>
+        <div class="card-action">
+            <a href="{% url 'sheets_update' sheet.id %}">Edit</a>
+            <a href="{% url 'sheets_delete' sheet.id %}">Delete</a>
+        </div>
+        </div>
+    </div>
+
+    <div class="col s6">
+        <form action="{% url 'add_listening' sheet.id %}" method="POST">
+            {% csrf_token %}
+            {{ listening_form.as_p }}
+            <input type="submit" class="btn" value="Add Listening Session">
+        </form>
+
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th>Review</th>
+                    <th>Performer</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for listening in sheet.listening_set.all %}
+                <tr>
+                    <td>{{ listening.get_review_display }}</td>
+                    <td>{{ listening.performer }}</td>
+                    <td>{{ listening.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr>
+<div class="row">
+  <div class="col s6">
+    <h3>{{ sheet.title }}'s Practice Sessions</h3>
+    {% if sheet.practices.count %}
+      {% for practice in sheet.practices.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              {{ practice.title }}
+              {{ practice.date }}
+              {{ practice.notes }}
+            </span>
+          </div>
+          <div class="card-action">
+            <form action="{% url 'unassoc_practice' sheet.id practice.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn">Remove</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>No Practice Sessions, Get Started On Those 40 Hrs</h5>
+    {% endif %}
   </div>
-  <div class="card-action">
-    <a href="{% url 'sheets_update' sheet.id %}">Edit</a>
-    <a href="{% url 'sheets_delete' sheet.id %}">Delete</a>
+  <div class="col s6">
+    <h3>Available Sessions</h3>
+    {% if practices.count %}
+      {% for practice in practices.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+                {{ practice.title }}
+                {{ practice.date }}
+                {{ practice.notes }}
+          </div>
+          <div class="card-action">
+            <form action="{% url 'assoc_practice' sheet.id practice.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn">Add</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>{{sheet.title}} has been practiced in all sessions</h5>
+    {% endif %}
   </div>
 </div>
 
+
+
+<script>
+    const dateEl = document.getElementById('id_date')
+    const selectEl = document.getElementById('id_review')
+    
+    M.Datepicker.init(dateEl, {
+        format: 'yyyy-mm-dd', 
+        defaultDate: new Date(), 
+        setDefaultDate: true, 
+        autoClose: true
+    })
+
+    M.FormSelect.init(selectEl)
+</script>
 {% endblock %}

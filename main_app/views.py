@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Sheet 
+from django.views.generic import ListView, DetailView
+from .models import Sheet, Practice
+from .forms import ListeningForm
 
 # Create your views here.
 
@@ -24,13 +26,35 @@ def sheets_index(request):
 
 def sheets_detail(request, sheet_id): 
     sheet = Sheet.objects.get(id=sheet_id) 
+    id_list = sheet.practices.all().values_list('id')
+    practices_sheet_doesnt_have = Practice.objects.exclude(id__in=id_list)
+    listening_form = ListeningForm()
     return render(request, 'sheets/detail.html', {
-        'sheet': sheet
+        'sheet': sheet, 
+        'listening_form': listening_form, 
+        'practices': practices_sheet_doesnt_have
     })
+
+def add_listening(request, sheet_id): 
+    form = ListeningForm(request.POST)
+    if form.is_valid():
+        new_listening = form.save(commit=False)
+        new_listening.sheet_id = sheet_id
+        new_listening.save()
+    return redirect('detail', sheet_id = sheet_id)
+
+def assoc_practice(request, sheet_id, practice_id): 
+    Sheet.objects.get(id=sheet_id).practices.add(practice_id)
+    return redirect('detail', sheet_id = sheet_id)
+
+def unassoc_practice(request, sheet_id, practice_id): 
+    Sheet.objects.get(id=sheet_id).practices.remove(practice_id)
+    return redirect('detail', sheet_id = sheet_id)
+
 
 class SheetCreate(CreateView): 
     model = Sheet
-    fields = '__all__'
+    fields = ['title', 'description', 'composer', 'key', 'diatonic']
 
 class SheetUpdate(UpdateView):
     model = Sheet
@@ -39,3 +63,24 @@ class SheetUpdate(UpdateView):
 class SheetDelete(DeleteView): 
     model = Sheet 
     success_url = '/sheets'
+
+class PracticeList(ListView): 
+    model = Practice 
+
+class PracticeDetail(DetailView): 
+    model = Practice 
+
+class PracticeCreate(CreateView): 
+    model = Practice 
+    fields = '__all__'
+
+class PracticeUpdate(UpdateView): 
+    model = Practice 
+    fields = ['notes']
+
+class PracticeDelete(DeleteView): 
+    model = Practice 
+    success_url = '/practices'
+
+
+

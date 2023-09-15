@@ -11,7 +11,7 @@
             <p>Composer: {{ sheet.composer }}</p>
             <p>Description: {{ sheet.description }}</p>
             {% if sheet.key %}
-                <p>Key: {{ sheet.key }}</p>
+                <p>Key: {{ sheet.get_key_display }} {{ sheet.get_diatonic_display }}</p>
             {% else %}
                 <p>Key: Unknown</p>
             {% endif %}

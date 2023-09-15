@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Practice Session List</h1>
+
+{% for practice in practice_list %}
+  <a href="{% url 'practices_detail' practice.id %}">
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">{{ practice.title }}</span>
+            <p>Date: {{ practice.date }}</p>
+            <p>Notes: {{ practice.notes }}</p>
+        </div>
+    </div>
+  </a>
+{% endfor %}
+
+{% endblock %}
